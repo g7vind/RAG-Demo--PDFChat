@@ -24,12 +24,6 @@ A Streamlit-based application that allows users to upload multiple PDF documents
    pip install langchain langchain_community streamlit langchain_google_genai PyPDF2 python-dotenv chromadb
    ```
 
-3. **Set up environment variables**:
-   Create a `.env` file in the project root and add your Google API key:
-   ```env
-   GOOGLE_API_KEY=your_google_api_key_here
-   ```
-
 ## Usage
 
 1. **Start the application**:
@@ -124,7 +118,6 @@ graph LR
 project/
 ├── main.py                 # Main application file
 ├── html_templates.py      # HTML/CSS templates for chat UI
-├── .env                   # Environment variables (create this)
 └── README.md             # This file
 ```
 
