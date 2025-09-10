@@ -34,7 +34,7 @@ A Streamlit-based application that allows users to upload multiple PDF documents
 
 1. **Start the application**:
    ```bash
-   streamlit run main.py
+   streamlit run app.py
    ```
 
 2. **Upload PDFs**:
@@ -45,86 +45,46 @@ A Streamlit-based application that allows users to upload multiple PDF documents
    - Once processing is complete, use the text input to ask questions about your documents
    - The AI will provide responses based on the content of your PDFs
 
-## Architecture
+## RAG Architecture
 
-The application follows a layered architecture with clear separation of concerns:
+The application implements a Retrieval-Augmented Generation (RAG) pipeline:
 
 ```mermaid
-graph TB
-    %% User Interface Layer
-    subgraph "User Interface Layer"
-        UI[📱 Streamlit Web Interface]
-        UPLOAD[📄 PDF Upload Widget]
-        CHAT[💬 Chat Input/Output]
-        SIDEBAR[🔧 Sidebar Controls]
-    end
-
-    %% Application Layer
-    subgraph "Application Layer"
-        MAIN[🎯 Main Application Controller]
-        HANDLER[⚡ User Input Handler]
-        SESSION[💾 Session State Manager]
-    end
-
-    %% Document Processing Pipeline
-    subgraph "Document Processing Pipeline"
-        EXTRACT[📖 PDF Text Extractor<br/>PyPDF2]
-        CHUNK[✂️ Text Chunker<br/>CharacterTextSplitter]
-        EMBED[🧠 Text Embeddings<br/>Google Gemini Embedding]
-        VECTOR[🗄️ Vector Store<br/>ChromaDB]
-    end
-
-    %% AI/ML Layer
-    subgraph "AI/ML Services"
-        GEMINI[🤖 Google Gemini 2.5 Flash<br/>Language Model]
-        MEMORY[🧩 Conversation Memory<br/>Buffer Memory]
-        CHAIN[🔗 Conversational Retrieval Chain<br/>LangChain]
-    end
-
-    %% External Services
-    subgraph "External Services"
-        GOOGLE_API[🌐 Google AI API<br/>Gemini Services]
-        ENV[⚙️ Environment Variables<br/>.env file]
-    end
-
-    %% Data Flow
-    UI --> MAIN
-    UPLOAD --> EXTRACT
-    CHAT --> HANDLER
-    SIDEBAR --> SESSION
+graph LR
+    %% Input
+    PDF[📄 PDF Documents] --> EXTRACT[📖 Text Extraction<br/>PyPDF2]
     
-    MAIN --> SESSION
-    HANDLER --> CHAIN
-    SESSION --> VECTOR
-    SESSION --> CHAIN
-
-    EXTRACT --> CHUNK
-    CHUNK --> EMBED
-    EMBED --> VECTOR
+    %% Document Processing
+    EXTRACT --> CHUNK[✂️ Text Chunking<br/>CharacterTextSplitter]
+    CHUNK --> EMBED[🧠 Embeddings<br/>Gemini Embedding]
+    EMBED --> VECTOR[(🗄️ Vector Store<br/>ChromaDB)]
     
-    VECTOR --> CHAIN
-    CHAIN --> GEMINI
-    CHAIN --> MEMORY
+    %% Query Processing
+    QUERY[❓ User Question] --> RETRIEVE[🔍 Similarity Search<br/>Vector Retrieval]
+    VECTOR --> RETRIEVE
     
-    EMBED --> GOOGLE_API
-    GEMINI --> GOOGLE_API
-    GOOGLE_API -.-> ENV
+    %% Generation
+    RETRIEVE --> CONTEXT[📋 Retrieved Context]
+    CONTEXT --> LLM[🤖 Language Model<br/>Gemini 2.5 Flash]
+    QUERY --> LLM
+    MEMORY[🧩 Chat Memory] --> LLM
     
-    CHAIN --> HANDLER
-    HANDLER --> UI
-
+    %% Output
+    LLM --> RESPONSE[💬 Generated Response]
+    LLM --> MEMORY
+    
     %% Styling
-    classDef uiLayer fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef appLayer fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef processLayer fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
-    classDef aiLayer fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef externalLayer fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef input fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef process fill:#e8f5e8,stroke:#388e3c,stroke-width:2px
+    classDef storage fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef generation fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    classDef output fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
 
-    class UI,UPLOAD,CHAT,SIDEBAR uiLayer
-    class MAIN,HANDLER,SESSION appLayer
-    class EXTRACT,CHUNK,EMBED,VECTOR processLayer
-    class GEMINI,MEMORY,CHAIN aiLayer
-    class GOOGLE_API,ENV externalLayer
+    class PDF,QUERY input
+    class EXTRACT,CHUNK,EMBED,RETRIEVE process
+    class VECTOR,MEMORY storage
+    class CONTEXT,LLM generation
+    class RESPONSE output
 ```
 
 ## How It Works
