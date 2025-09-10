@@ -136,7 +136,6 @@ project/
 ### Common Issues
 
 1. **Google API Key Error**:
-   - Ensure your `.env` file contains a valid `GOOGLE_API_KEY`
    - Verify the API key has access to Gemini AI services
 
 2. **PDF Processing Issues**:
