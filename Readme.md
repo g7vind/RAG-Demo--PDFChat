@@ -122,10 +122,9 @@ graph LR
 
 ```
 project/
-├── app.py                 # Main application file
+├── main.py                 # Main application file
 ├── html_templates.py      # HTML/CSS templates for chat UI
 ├── .env                   # Environment variables (create this)
-├── requirements.txt       # Python dependencies (optional)
 └── README.md             # This file
 ```
 
